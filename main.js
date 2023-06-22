@@ -16,6 +16,7 @@ let gameOver = false;
 const tableData = [];
 let playsAgain = false;
 let playerOneIsPlaying = true;
+let previousIdPlayed = 0;
 
 const createTable = () => {
   for (let i = 0; i < 12; i++) {
@@ -149,16 +150,34 @@ const checkAndSetSeedsToPits = (playerOneTurn, selectedPitId, seedsOnSelectedPit
         round--;
       }
     } else if (seedsRest > 6) {
-      for (let i = 0; i < seedsRest; i++) {
-        tableData[6 + i].seeds++;
+      if (seedsRest > 6) {
+        const secondRest = seedsRest - 6;
+
+        for (let i = 0; i < (seedsRest - secondRest); i++) {
+          tableData[6 + i].seeds++;
+        }
+        for (let i = 0; i < secondRest; i++) {
+          tableData[5 - i].seeds++;
+        }
+      } else {
+        for (let i = 0; i < seedsRest; i++) {
+          tableData[6 + i].seeds++;
+        }
       }
     } else {
-      let lastPostion = 0;
-      for (let i = 0; i < seedsOnSelectedPit; i++) {
-        selectedPitId--;
-        lastPostion = selectedPitId;
-        if (tableData[lastPostion].seeds === 0) break;
-        tableData[selectedPitId].seeds++;
+      const lastPostion = selectedPitId - seedsOnSelectedPit;
+
+      if (tableData[lastPostion].seeds === 0) {
+        for (let i = 0; i < (seedsOnSelectedPit - 1); i++) {
+          selectedPitId--;
+          tableData[selectedPitId].seeds++;
+        }
+      } else {
+        for (let i = 0; i < seedsOnSelectedPit; i++) {
+          selectedPitId--;
+          tableData[selectedPitId].seeds++;
+        }
+        gameNotesText.value = `Player 1 didn't score! Player 2 turn!`
       }
 
       checkIfEndedInFrontOfEmptyPit(playerOneTurn, lastPostion);
@@ -180,8 +199,19 @@ const checkAndSetSeedsToPits = (playerOneTurn, selectedPitId, seedsOnSelectedPit
         round--;
       }
     } else if (seedsRest > 6) {
-      for (let i = 0; i < seedsRest; i++) {
-        tableData[5 - i].seeds++;
+      if (seedsRest > 6) {
+        const secondRest = seedsRest - 6;
+
+        for (let i = 0; i < (seedsRest - secondRest); i++) {
+          tableData[5 - i].seeds++;
+        }
+        for (let i = 0; i < secondRest; i++) {
+          tableData[6 + i].seeds++;
+        }
+      } else {
+        for (let i = 0; i < seedsRest; i++) {
+          tableData[5 - i].seeds++;
+        }
       }
     } else {
       let lastPostion = selectedPitId + seedsOnSelectedPit;
@@ -195,6 +225,7 @@ const checkAndSetSeedsToPits = (playerOneTurn, selectedPitId, seedsOnSelectedPit
           selectedPitId++;
           tableData[selectedPitId].seeds++;
         }
+        gameNotesText.value = `Player 2 didn't score! Player 1 turn!`
       }
 
       checkIfEndedInFrontOfEmptyPit(playerOneTurn, lastPostion);
@@ -247,6 +278,12 @@ const getClick = (e) => {
   const selectedPitId = parseInt(e.target.id.split('n')[1]);
 
   const seedsOnSelectedPit = tableData[selectedPitId].seeds;
+
+  if (seedsOnSelectedPit === 0) {
+    alert('You cannot play this pit since it is empty. Try another one.');
+    round--;
+    return;
+  }
 
   tableData[selectedPitId].seeds = 0;
 
