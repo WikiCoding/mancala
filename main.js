@@ -133,121 +133,130 @@ const checkAndSetPlayerScores = (playerOneTurn, selectedPitId, seedsOnSelectedPi
 }
 
 const checkAndSetSeedsToPits = (playerOneTurn, selectedPitId, seedsOnSelectedPit) => {
-  if (playerOneTurn) {
-    const seedsRest = seedsOnSelectedPit - (selectedPitId + 1);
+  try {
 
-    if (seedsRest >= 0 && seedsRest <= 6) {
-      for (let i = 0; i < selectedPitId; i++) {
-        tableData[i].seeds++;
-      }
-
-      for (let i = 0; i < seedsRest; i++) {
-        tableData[i + 6].seeds++;
-      }
-
-      if (seedsRest === 0) {
-        gameNotesText.value = `Player 1 plays another round!`;
-        round--;
-      }
-    } else if (seedsRest > 6) {
-      if (seedsRest > 6) {
-        const secondRest = seedsRest - 6;
-
-        for (let i = 0; i < (seedsRest - secondRest); i++) {
-          tableData[6 + i].seeds++;
+    if (playerOneTurn) {
+      const seedsRest = seedsOnSelectedPit - (selectedPitId + 1);
+  
+      if (seedsRest >= 0 && seedsRest <= 6) {
+        for (let i = 0; i < selectedPitId; i++) {
+          tableData[i].seeds++;
         }
-        for (let i = 0; i < secondRest; i++) {
-          tableData[5 - i].seeds++;
+  
+        for (let i = 0; i < seedsRest; i++) {
+          tableData[i + 6].seeds++;
+        }
+  
+        if (seedsRest === 0) {
+          gameNotesText.value = `Player 1 plays another round!`;
+          round--;
+        }
+      } else if (seedsRest > 6) {
+        if (seedsRest > 6) {
+          const secondRest = seedsRest - 6;
+  
+          for (let i = 0; i < (seedsRest - secondRest); i++) {
+            tableData[6 + i].seeds++;
+          }
+          for (let i = 0; i < secondRest; i++) {
+            tableData[5 - i].seeds++;
+          }
+        } else {
+          for (let i = 0; i < seedsRest; i++) {
+            tableData[6 + i].seeds++;
+          }
         }
       } else {
-        for (let i = 0; i < seedsRest; i++) {
-          tableData[6 + i].seeds++;
+        const lastPostion = selectedPitId - seedsOnSelectedPit;
+  
+        if (tableData[lastPostion].seeds === 0) {
+          for (let i = 0; i < (seedsOnSelectedPit - 1); i++) {
+            selectedPitId--;
+            tableData[selectedPitId].seeds++;
+          }
+        } else {
+          for (let i = 0; i < seedsOnSelectedPit; i++) {
+            selectedPitId--;
+            tableData[selectedPitId].seeds++;
+          }
+          gameNotesText.value = `Player 1 didn't score! Player 2 turn!`
         }
+  
+        checkIfEndedInFrontOfEmptyPit(playerOneTurn, lastPostion);
       }
     } else {
-      const lastPostion = selectedPitId - seedsOnSelectedPit;
-
-      if (tableData[lastPostion].seeds === 0) {
-        for (let i = 0; i < (seedsOnSelectedPit - 1); i++) {
-          selectedPitId--;
-          tableData[selectedPitId].seeds++;
+      const seedsRest = (selectedPitId + seedsOnSelectedPit) - 12;
+  
+      if (seedsRest >= 0 && seedsRest <= 6) {
+        for (let i = 0; i < (seedsOnSelectedPit - (seedsRest + 1)); i++) {
+          tableData[i + (selectedPitId + 1)].seeds++;
         }
-      } else {
-        for (let i = 0; i < seedsOnSelectedPit; i++) {
-          selectedPitId--;
-          tableData[selectedPitId].seeds++;
-        }
-        gameNotesText.value = `Player 1 didn't score! Player 2 turn!`
-      }
-
-      checkIfEndedInFrontOfEmptyPit(playerOneTurn, lastPostion);
-    }
-  } else {
-    const seedsRest = (selectedPitId + seedsOnSelectedPit) - 12;
-
-    if (seedsRest >= 0 && seedsRest <= 6) {
-      for (let i = 0; i < (seedsOnSelectedPit - (seedsRest + 1)); i++) {
-        tableData[i + (selectedPitId + 1)].seeds++;
-      }
-
-      for (let i = 0; i < seedsRest; i++) {
-        tableData[5 - i].seeds++;
-      }
-
-      if (seedsRest === 0) {
-        gameNotesText.value = `Player 2 plays another round!`;
-        round--;
-      }
-    } else if (seedsRest > 6) {
-      if (seedsRest > 6) {
-        const secondRest = seedsRest - 6;
-
-        for (let i = 0; i < (seedsRest - secondRest); i++) {
-          tableData[5 - i].seeds++;
-        }
-        for (let i = 0; i < secondRest; i++) {
-          tableData[6 + i].seeds++;
-        }
-      } else {
+  
         for (let i = 0; i < seedsRest; i++) {
           tableData[5 - i].seeds++;
         }
-      }
-    } else {
-      let lastPostion = selectedPitId + seedsOnSelectedPit;
-      if (tableData[lastPostion].seeds === 0) {
-        for (let i = 0; i < (seedsOnSelectedPit - 1); i++) {
-          selectedPitId++;
-          tableData[selectedPitId].seeds++;
+  
+        if (seedsRest === 0) {
+          gameNotesText.value = `Player 2 plays another round!`;
+          round--;
+        }
+      } else if (seedsRest > 6) {
+        if (seedsRest > 6) {
+          const secondRest = seedsRest - 6;
+  
+          for (let i = 0; i < (seedsRest - secondRest); i++) {
+            tableData[5 - i].seeds++;
+          }
+          for (let i = 0; i < secondRest; i++) {
+            tableData[6 + i].seeds++;
+          }
+        } else {
+          for (let i = 0; i < seedsRest; i++) {
+            tableData[5 - i].seeds++;
+          }
         }
       } else {
-        for (let i = 0; i < seedsOnSelectedPit; i++) {
-          selectedPitId++;
-          tableData[selectedPitId].seeds++;
+        let lastPostion = selectedPitId + seedsOnSelectedPit;
+        if (tableData[lastPostion].seeds === 0) {
+          for (let i = 0; i < (seedsOnSelectedPit - 1); i++) {
+            selectedPitId++;
+            tableData[selectedPitId].seeds++;
+          }
+        } else {
+          for (let i = 0; i < seedsOnSelectedPit; i++) {
+            selectedPitId++;
+            tableData[selectedPitId].seeds++;
+          }
+          gameNotesText.value = `Player 2 didn't score! Player 1 turn!`
         }
-        gameNotesText.value = `Player 2 didn't score! Player 1 turn!`
+  
+        checkIfEndedInFrontOfEmptyPit(playerOneTurn, lastPostion);
       }
-
-      checkIfEndedInFrontOfEmptyPit(playerOneTurn, lastPostion);
     }
-  }
-
-  checkGameOver();
-  if (gameOver) {
-    const win = (p1Score > p2Score) ? `Player 1 wins with ${p1Score} points.` : `Player 2 wins with ${p2Score} points.`
-    const lost = (p1Score > p2Score) ? `Player 2 finished with ${p2Score} points.` : `Player 1 finished with ${p1Score} points.`
-    gameNotesText.value = `Game ended. ${win} ${lost}`;
-
-    gameOverTextWinner.value = win;
-    gameOverTextLoser.value = lost;
-
-    modal.style.display = "block";
-
-    startCountdown(5);
-
-    setTimeout(() => {
-      window.location.reload();
-    }, 5000);
+  
+    checkGameOver();
+    if (gameOver) {
+      if (p1Score > p2Score || p1Score < p2Score) {
+        const win = (p1Score > p2Score) ? `Player 1 wins with ${p1Score} points.` : `Player 2 wins with ${p2Score} points.`
+        const lost = (p1Score > p2Score) ? `Player 2 finished with ${p2Score} points.` : `Player 1 finished with ${p1Score} points.`
+        gameNotesText.value = `Game ended. ${win} ${lost}`;
+    
+        gameOverTextWinner.value = win;
+        gameOverTextLoser.value = lost;
+      } else {
+        gameNotesText.value = `Player 1 and Player 2 ended up tied!`
+      }
+  
+      modal.style.display = "block";
+  
+      startCountdown(5);
+  
+      setTimeout(() => {
+        window.location.reload();
+      }, 5000);
+    }
+  } catch (e) {
+    alert('Sorry, An unexpected error occoured, please restart the game!')
   }
 }
 
