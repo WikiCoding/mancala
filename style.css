@@ -161,12 +161,15 @@ h2 {
 }
 
 #game-notes-modal-winner {
+  border: none;
+  margin-bottom: 15px;
   text-align: center;
   font-size: larger;
   font-weight: bold;
 }
 
 #game-notes-modal-loser {
+  border: none;
   text-align: center;
   font-size: medium;
 }
